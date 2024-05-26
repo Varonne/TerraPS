@@ -1,0 +1,19 @@
+[package]
+name = "rust-launcher"
+version.workspace = true
+edition = "2021"
+
+[dependencies]
+mozdevice = "0.5"
+frida.workspace = true
+common_utils = { path = "../common" }
+anyhow.workspace = true
+
+[profile.release]
+
+strip = true      # Automatically strip symbols from the binary.
+lto = true        # Link-time optimization.
+opt-level = 3     # Optimize for speed.
+codegen-units = 1 # Maximum size reduction optimizations.
+debug = false     # Disable debug information.
+rpath = true      # Disable runtime path.

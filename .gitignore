@@ -3,12 +3,7 @@
 /patches
 /.venv
 /.idea
-/case
-/debug
-/dump
-/packaged
+/dbg
 /assets
 *.txt
-!game.txt
-!requirements.txt
 *.log

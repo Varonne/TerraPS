@@ -1,27 +1,24 @@
-[package]
-name = "terra-ps"
-version = "0.4.5+fix1"
-edition = "2021"
-description = "Server implementations for a certain Gacha Tower Defense game."
-authors = ["Rh", "EnokiUN", "UPON"]
-publish = false
+[workspace]
+members = ["terraps", "common", "launcher", "xtask"]
+resolver = "2"
 
-[dependencies]
+[workspace.package]
+version = "0.6.0"
+
+[workspace.dependencies]
 anyhow = "1"
 chrono = "0.4"
 constcat = "0.5"
-subtle-encoding = "0.5"
 axum = "0.7"
 axum-server = "0.6"
 base64 = "0.22"
 zip = "1"
-uuid = { version = "1.8", features = ["v4", "fast-rng", "macro-diagnostics"] }
+uuid = { version = "1", features = ["v4", "fast-rng", "macro-diagnostics"] }
 rand = { version = "0.8", features = ["std_rng"] }
 
 # Crypto
 aes = "0.8"
 cbc = { version = "0.1", features = ["std"] }
-hex = "0.4"
 libaes = "0.7"
 ring = "0.17"
 md-5 = "0.10"
@@ -30,7 +27,8 @@ md-5 = "0.10"
 reqwest = { version = "0.12", features = ["json"] }
 
 # Tokio
-tokio = { version = "1.37", features = ["full"] }
+h2 = "0.4"
+tokio = { version = "1", features = ["full"] }
 tokio-util = { version = "0.7", features = ["io"] }
 
 # Data serialization
@@ -42,9 +40,7 @@ tracing = "0.1"
 tracing-futures = "0.2"
 tracing-log = { version = "0.2", features = ["log-tracer", "std"] }
 tracing-subscriber = { version = "0.3", features = [
-    "env-filter",
     "std",
-    "registry",
     "tracing",
     "tracing-log",
 ] }
@@ -52,9 +48,8 @@ tracing-subscriber = { version = "0.3", features = [
 # Tower
 tower-http = { version = "0.5", features = ["trace"] }
 
-[[bin]]
-name = "terra-ps"
-path = "src/main.rs"
+# Frida
+frida = { version = "0.13", features = ["auto-download"] }
 
 [profile.release]
 

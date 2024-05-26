@@ -19,7 +19,7 @@
     },
     "version": {
         "android": {
-            "resVersion": "24-05-08-17-17-47-f6390e",
+            "resVersion": "24-05-22-06-44-01-4a3244",
             "clientVersion": "2.2.61"
         }
     },
@@ -116,7 +116,8 @@
         "fakeTime": -1,
         "vision": true,
         "nickName": "Terra",
-        "nickNumber": "1111"
+        "nickNumber": "1111",
+        "forceEnableBattleReplay": false
     },
     "charConfig": {
         "favorPoint": 25570,
