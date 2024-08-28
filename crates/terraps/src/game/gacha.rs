@@ -177,7 +177,9 @@ pub mod advanced {
 
     #[derive(Deserialize, Default)]
     struct GachaResultInternal {
+        #[serde(rename = "charId")]
         pub cid: String,
+        #[serde(rename = "isNew")]
         pub is_new: i64,
     }
 
