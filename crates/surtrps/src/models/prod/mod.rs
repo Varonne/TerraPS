@@ -5,14 +5,13 @@ use serde::{Deserialize, Serialize};
 use serde_json::from_value;
 
 use crate::{cnst::config::CONFIG_PATH, SERVER_CONFIG};
-pub use network::{ProdAndroidNetwork, ProdAndroidRemote};
+pub use network::ProdAndroidNetwork;
 
 #[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ProdAndroidVersion {
-    #[serde(rename = "resVersion")]
-    res_ver: String,
-    #[serde(rename = "clientVersion")]
-    clnt_ver: String,
+    res_version: String,
+    client_version: String,
 }
 
 impl ProdAndroidVersion {
@@ -26,23 +25,21 @@ impl ProdAndroidVersion {
 }
 
 #[derive(Serialize, Deserialize, Default)]
+#[serde(rename_all = "camelCase")]
 pub struct ProdAndroidRefresh {
-    #[serde(rename = "resVersion")]
-    res_ver: (),
+    res_version: (),
 }
 
 #[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct Announce {
-    #[serde(rename = "announceId")]
-    id: String,
+    announce_id: String,
     day: i64,
     group: String,
-    #[serde(rename = "isWebUrl")]
-    is_url: bool,
+    is_web_url: bool,
     month: i64,
     title: String,
-    #[serde(rename = "webUrl")]
-    url: String,
+    web_url: String,
 }
 
 #[derive(Serialize, Deserialize, Default)]
@@ -52,12 +49,11 @@ struct Extra {
 }
 
 #[derive(Serialize, Deserialize, Default)]
+#[serde(rename_all = "camelCase")]
 pub struct AnnouncementMeta {
-    #[serde(rename = "announceList")]
-    list: Vec<Announce>,
+    announce_list: Vec<Announce>,
     extra: Extra,
-    #[serde(rename = "focusAnnounceId")]
-    focus_id: (),
+    focus_announce_id: (),
 }
 
 impl AnnouncementMeta {
@@ -95,3 +91,6 @@ impl Default for PreannouncementMeta {
         }
     }
 }
+
+#[derive(Serialize, Deserialize)]
+pub struct ProdAndroidRemote {}
