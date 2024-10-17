@@ -6,7 +6,7 @@ use axum::{
 use tower_http::trace::{DefaultMakeSpan, DefaultOnEos, DefaultOnFailure, DefaultOnRequest, DefaultOnResponse, TraceLayer};
 use tracing::Level;
 
-use crate::models::PlayerDataDeltaStatic;
+use models::PlayerDataDelta;
 
 use super::{
     core::{asset, prod_cfg},
@@ -31,7 +31,11 @@ pub fn app() -> Router {
 }
 
 fn account_routes() -> Router {
-    Router::new().route("/syncPushMessage", post(account::sync_push_data))
+    Router::new()
+        .route("/syncPushMessage", post(account::sync_push_data))
+        .route("/login", post(account::login))
+        .route("/syncData", post(account::sync_data))
+        .route("/syncStatus", post(account::sync_status))
 }
 
 fn crisis_v2_routes() -> Router {
@@ -49,15 +53,14 @@ fn prod_config_routes() -> Router {
 }
 
 fn misc_routes() -> Router {
-    Router::new()
-        .route("/assetbundle/official/Android/assets/:hash/:name", get(asset::get_file))
-        .route("/background/setBackground", post(bg::change_bg))
-        .route("/homeTheme/change", post(bg::change_theme))
-        .route("/event", post(misc::event))
-        .route("/batch_event", post(misc::batch_event))
-        .route("/beat", post(misc::beat))
+    Router::new().route("/assetbundle/official/Android/assets/:hash/:name", get(asset::get_file))
+    // .route("/background/setBackground", post(bg::change_bg))
+    // .route("/homeTheme/change", post(bg::change_theme))
+    // .route("/event", post(misc::event))
+    // .route("/batch_event", post(misc::batch_event))
+    // .route("/beat", post(misc::beat))
 }
 
-async fn fallback() -> Json<PlayerDataDeltaStatic> {
-    Json(PlayerDataDeltaStatic::default())
+async fn fallback() -> Json<PlayerDataDelta> {
+    Json(PlayerDataDelta::default())
 }

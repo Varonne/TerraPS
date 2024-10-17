@@ -6,7 +6,7 @@ use std::{
 };
 
 use anyhow::{anyhow, Result};
-use common_utils::write_json;
+use common_utils::{decrypt, write_json};
 use reqwest::get;
 use serde::{Deserialize, Serialize};
 use serde_json::{from_str, Value};
@@ -18,14 +18,13 @@ use crate::{
         global_url::*,
         url::*,
     },
-    models::prod::{
-        network::{NetworkConfigContent, ProdAndroidNetworkConfig},
-        ProdAndroidNetwork, ProdAndroidVersion,
-    },
     SERVER_CONFIG,
 };
 
-use super::b64::decrypt;
+use models::prod::{
+    network::{NetworkConfigContent, NwCfgEnum, ProdAndroidNetworkConfig},
+    ProdAndroidNetwork, ProdAndroidVersion,
+};
 
 #[derive(Clone, Copy)]
 pub enum Mode {
@@ -76,6 +75,7 @@ pub async fn update() -> Result<()> {
         Mode::Global => (old_ver_cfgs.remove("versionGlobal").unwrap(), old_ver_cfgs.remove("version").unwrap()),
     };
 
+    println!("Updating Version Config...");
     let new_ver_cfg = get(from_utf8(&decrypt(VER_CONF)?)?).await?.json::<ProdAndroidVersion>().await?;
 
     if old_ver_cfg.android.res_version != new_ver_cfg.res_version {
@@ -101,19 +101,22 @@ pub async fn update() -> Result<()> {
 
     write_json(VERSION_CONFIG_PATH, old_ver_cfgs)?;
 
+    println!("Updating Network Config...");
     let new_net_cfg = get(from_utf8(decrypt(NW_CONF)?.as_slice())?).await?.json::<ProdAndroidNetwork>().await?;
 
-    let new_nwcfg_content = from_str::<NetworkConfigContent>(&new_net_cfg.content)?;
+    let mut new_nwcfg_content = from_str::<NetworkConfigContent>(&new_net_cfg.content)?;
 
     let mut old_net_cfgs = from_str::<HashMap<String, ProdAndroidNetworkConfig>>(&read_to_string(File::open(NETWORK_CONFIG_TEMPLATE_PATH)?)?)?;
 
     let mut old_net_cfg = old_net_cfgs.remove(mode.to_str()).unwrap();
 
     if old_net_cfg.content.config_ver != new_nwcfg_content.config_ver {
-        let mut tmp_nwcfg = new_nwcfg_content.configs.get(&new_nwcfg_content.config_ver).unwrap().clone();
+        let mut tmp_nwcfg = new_nwcfg_content.configs.remove(&new_nwcfg_content.config_ver).unwrap();
 
-        tmp_nwcfg.network.pkg_ad = None;
-        tmp_nwcfg.network.pkg_ios = None;
+        if let NwCfgEnum::NwCfg(ref mut tmp_nwcfg) = tmp_nwcfg {
+            let _ = tmp_nwcfg.network.pkg_ad.take();
+            let _ = tmp_nwcfg.network.pkg_ios.take();
+        };
 
         old_net_cfg.content.config_ver = new_nwcfg_content.config_ver.clone();
         old_net_cfg.content.configs.insert(new_nwcfg_content.config_ver, tmp_nwcfg);
@@ -123,6 +126,7 @@ pub async fn update() -> Result<()> {
     write_json(NETWORK_CONFIG_TEMPLATE_PATH, old_net_cfgs)?;
 
     if excel_update_required {
+        println!("Updating Excel Data...");
         update_excel(mode).await?
     }
 
@@ -154,6 +158,7 @@ async fn update_excel(mode: Mode) -> Result<()> {
             CHARWORD_TABLE_URL,
             GACHA_TABLE_URL,
             GAMEDATA_CONST_URL,
+            ZONE_TABLE_CONST_URL,
         ],
         Mode::Global => [
             GLOBAL_ACTIVITY_TABLE_URL,
@@ -178,6 +183,7 @@ async fn update_excel(mode: Mode) -> Result<()> {
             GLOBAL_CHARWORD_TABLE_URL,
             GLOBAL_GACHA_TABLE_URL,
             GLOBAL_GAMEDATA_CONST_URL,
+            GLOBAL_ZONE_TABLE_CONST_URL,
         ],
     };
 
@@ -193,6 +199,7 @@ async fn update_excel(mode: Mode) -> Result<()> {
 }
 
 async fn update_excel_data(link: &str) -> Result<()> {
+    println!("Sending request to: {}", link);
     let path = link
         .replace("https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata", "./data")
         .replace("https://ak-conf.hypergryph.com/config/prod/announce_meta/Android", "./data/announce")
