@@ -582,8 +582,8 @@ pub async fn account_sync_data() -> JSON {
     }
 
     // Mails
-    let received_mails = mail_data["recievedIDs"].as_array().unwrap().iter().map(|id| id.as_u64().unwrap()).collect::<Vec<u64>>();
-    let deleted_mails = mail_data["deletedIDs"].as_array().unwrap().iter().map(|id| id.as_u64().unwrap()).collect::<Vec<u64>>();
+    let received_mails = mail_data["receivedIds"].as_array().unwrap().iter().map(|id| id.as_u64().unwrap()).collect::<Vec<u64>>();
+    let deleted_mails = mail_data["deletedIds"].as_array().unwrap().iter().map(|id| id.as_u64().unwrap()).collect::<Vec<u64>>();
     for mail_id in get_keys(&mail_data["mailList"]) {
         if received_mails.clone().contains(&mail_id.parse::<u64>().unwrap()) && deleted_mails.clone().contains(&mail_id.parse::<u64>().unwrap()) {
             player_data["user"]["pushFlags"]["hasGifts"] = json!(1);
