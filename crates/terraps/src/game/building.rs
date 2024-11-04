@@ -108,7 +108,7 @@ pub async fn building_change_diy_solution(Json(payload): JSON) -> JSON {
 
 pub async fn building_assign_char(Json(payload): JSON) -> JSON {
     let room_slot_id = payload["roomSlotId"].as_str().unwrap();
-    let char_inst_id_list = payload["charInstId"].as_array().unwrap();
+    let char_inst_id_list = payload["charInstIdList"].as_array().unwrap();
 
     let mut building_data = read_json(BUILDING_JSON_PATH);
     for char_inst_id in char_inst_id_list {
